@@ -5,9 +5,10 @@ from cryptography.fernet import Fernet
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(CURRENT_DIRECTORY, 'db_config.json')
-
+# Used Fernet.generate_key() to generate key
+ENCRYPTION_KEY = b'Nbdl8-XaSvp9uZsTM3Hmnixc9nSlmJ9BKf7w6xpyVMA='
 class DBConfig:
-    def __init__(self, config_file, encryption_key, reset = False):
+    def __init__(self, config_file=CONFIG_FILE, encryption_key=ENCRYPTION_KEY, reset = False):
         self.config_file = config_file
         self.encryption_key = encryption_key
         self.reset = reset
@@ -70,8 +71,6 @@ class DBConfig:
 
 if __name__ == "__main__":
 
-    # Used Fernet.generate_key() to generate key
-    ENCRYPTION_KEY = b'Nbdl8-XaSvp9uZsTM3Hmnixc9nSlmJ9BKf7w6xpyVMA='
     db_config = DBConfig(CONFIG_FILE, ENCRYPTION_KEY)
     src_config, dest_config = db_config.get_db_config()
 
