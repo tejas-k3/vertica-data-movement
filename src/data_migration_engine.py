@@ -40,6 +40,24 @@ class DataEngine:
             else db_columns == csv_columns
 
     @staticmethod
+    def column_conversion_index(db_columns, row):
+        timestampz_column_indexs = set()
+        ipv4_column_indexs = set()
+        ipv6_column_indexs = set()
+        numerical_column_indexs = set()
+        # A SPECIAL CASE COULD BE NULL YET TO CONFIRM
+        # empty_column_indexs = set()
+        for i in range(len(db_columns)):
+            if db_columns[i] in TIME_BASED:
+                timestampz_column_indexs.add(i)
+            elif db_columns[i] in IPV4_BASED:
+                ipv4_column_indexs.add(i)
+            elif db_columns[i] in IPV6_BASED:
+                ipv6_column_indexs.add(i)
+            elif db_columns[i] in NUMERICAL_BASED:
+                numerical_column_indexs.add(i)
+
+    @staticmethod
     def convert_string_to_varbinary(value):
         # Convert the IP address to bytes in varbinary format
         return bytes(value, encoding='utf-8')
