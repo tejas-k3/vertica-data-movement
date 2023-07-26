@@ -40,6 +40,12 @@ class DBInterface:
             cursor.execute(f"SELECT table_name FROM v_catalog.tables WHERE table_schema = '{schema}'")
             return [row[0] for row in cursor.fetchall()]
 
+    def get_table_columns(self, table_name, schema):
+        # Retrieve a list of all column names in the specified table and schema
+        with self as cursor:
+            cursor.execute(f"SELECT column_name FROM v_catalog.columns WHERE table_schema = '{schema}' AND table_name = '{table_name}'")
+            return [row[0] for row in cursor.fetchall()]
+
     def copy_table_data_to_csv(self, dest_db_interface, table_name, dest_file_path, schema):
         # Use the COPY command to copy data from the source table to the CSV file
         with dest_db_interface as cursor:
