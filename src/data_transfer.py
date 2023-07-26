@@ -42,6 +42,9 @@ class DataTransfer:
 
     def copy_table_data(self, table_name, src_db_interface=None, dest_db_interface=None, csv_file = None):
         # THERE HAS TO BE SOMETHING BETTER
+        # Note :- Gather all schema & tables in the src db, generate
+        # a json file let user edit the file to confirm which
+        # tables' data to be transferred & accordingly proceed!
         pass
         # # Get the CSV file path for the table data
         # csv_file_path = os.path.join(self.data_source, f"{table_name}.csv")
