@@ -22,6 +22,26 @@ class DataEngine:
         return columns
 
     @staticmethod
+    def schema_match(table_name, src_db_interface=None, dest_db_interface=None, csv_file = None):
+        # Check if the schema of the table matches between source and destination databases
+        # OR between csv file of the table & table schema in the database.
+        src_columns = []
+        dest_columns = []
+        # It's db to db copy case
+        if src_db_interface is not None and dest_db_interface is not None:
+            return src_columns == dest_columns
+        # One is db, other is csv
+        db_columns = src_db_interface.get_table_columns(table_name, self.src_schema) \
+            if src_db_interface is not None else \
+            dest_db_interface.get_table_columns(table_name, self.dest_schema)
+        csv_columns = get_csv_columns(csv_file)
+        # if we get int value (count of columns), header is missing in CSV.
+        return len(db_columns) == csv_columns if isinstance(csv_columns, int) \
+            else db_columns == csv_columns
+
+        
+
+    @staticmethod
     def convert_to_varbinary(value):
         # Convert the IP address to bytes in varbinary format
         return bytes(value, encoding='utf-8')
