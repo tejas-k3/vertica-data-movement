@@ -215,14 +215,14 @@ if __name__ == "__main__":
     # args = parser.parse_args()
     # src_config = sys.argv[1]
     # dest_config = sys.argv[2]
+    print("Starting Backup and restore of IDS")
+
     DM = DataMigration()
     config_file = DM.get_config_file()
     with open(config_file) as conf_file:
         config = json.load(conf_file)
     source_db = DBInterface(config, 'source')
-    # data_transfer_app = DataTransferApp(
-    #     src_config, dest_config, args.data_source, args.mode)
-    # data_transfer_app.run()
+
     create_schema = 'CREATE TABLE IF NOT EXISTS schema_columns(schema_name VARCHAR(128),table_name VARCHAR(128),' \
                     'column_name VARCHAR(128),data_type VARCHAR(128)) '
     source_db.execute(create_schema, [])
@@ -252,8 +252,15 @@ if __name__ == "__main__":
             copy_query += " FROM %s.%s;'" % (schema, table)
             ssh_class = ConfdCommandInterface(config['database']['source']['host'])
             commands = ['unhide netintact', 'kvasthilda', 'netintact', copy_query]
-            output, stderr = ssh_class.ssh_commands_execution(commands)
-            output = list(filter(None, output.strip().split("\r\n")))
-            print("Successfully created backup csvs")
+            ssh_class.ssh_commands_execution(commands)
+
+    ssh_class = ConfdCommandInterface(config['database']['source']['host'])
+    commands = ['unhide netintact', 'kvasthilda', 'netintact', "docker inspect --format='{{.Id}}' ids-database"]
+    output, stderr = ssh_class.ssh_commands_execution(commands)
+    output = list(filter(None, output.strip().split("\r\n")))
+    commands = ['unhide netintact', 'kvasthilda', 'netintact', "docker cp {}:/tmp /".format(output[-1])]
+    output, stderr = ssh_class.ssh_commands_execution(commands)
+
+    print("Successfully created backup csvs in tmp directory")
     drop_table = 'DROP TABLE schema_columns'
     schema = source_db.execute(drop_table, [])
