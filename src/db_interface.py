@@ -1,20 +1,49 @@
 import vertica_python
+from vertica_python import connect, errors  # pylint: disable=import-error
 
 DEFAULT_HOST = '127.0.0.1'
 DEFAULT_PORT = '5433'
 DEFAULT_USER = 'dbadmin'
 DEFAULT_PWD = 'no_default_enter_pwd'
+
+
 class DBInterface:
-    def __init__(self, config):
-        # Private attribute to store connection info
-        self._conn_info = {
-            'host': config('host', DEFAULT_HOST),
-            'port': config('port', DEFAULT_PORT),
-            # CHANGED FOR A SPECIFIC USECASE
-            'database': config.get('vertica-database', DEFAULT_DATABASE),
-            'user': config.get('user', DEFAULT_USER),
-            'password': config('password', DEFAULT_PWD)
-        }
+    def __init__(self, config, feature='forensics'):
+        """
+        @param config: Insights DB Connection parameters
+        """
+        self.iteration_count = 0
+        for data_source_item in config['database']:
+            if data_source_item == feature:
+                self.conn_info = {'host': config['database'][data_source_item]['host'],
+                                  'user': config['database'][data_source_item].get('username', 'dbadmin'),
+                                  'password': config['database'][data_source_item].get('password', ''),
+                                  'database': config['database'][data_source_item].get('name', 'insights_data'),
+                                  'use_prepared_statements': True}
+
+    def connect_to_vertica(self):
+        """
+        Establishes connection to Vertica DB
+        @return: Connection
+        """
+
+        self.conn_info['host'] = self.conn_info['host']
+        self.conn_info['backup_server_node'] = []
+
+        return connect(**self.conn_info)
+
+    def execute(self, query, params):
+        """
+        Executes the passed query, query can be prepared statements
+        @param query: Query to be executed
+        @param params: Query parameters
+        """
+        with self.connect_to_vertica() as connection:
+            cur = connection.cursor()
+            cur.execute(query, params, use_prepared_statements=True)
+            results = cur.fetchall()
+            connection.commit()
+            return results
 
     def __enter__(self):
         # Establish a connection to the Vertica database and return the cursor
@@ -43,7 +72,8 @@ class DBInterface:
     def get_table_columns(self, table_name, schema):
         # Retrieve a list of all column names in the specified table and schema
         with self as cursor:
-            cursor.execute(f"SELECT column_name FROM v_catalog.columns WHERE table_schema = '{schema}' AND table_name = '{table_name}'")
+            cursor.execute(
+                f"SELECT column_name FROM v_catalog.columns WHERE table_schema = '{schema}' AND table_name = '{table_name}'")
             return [row[0] for row in cursor.fetchall()]
 
     def copy_table_data_to_csv(self, dest_db_interface, table_name, dest_file_path, schema):

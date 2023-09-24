@@ -1,5 +1,8 @@
+import csv
+
 from libs.column_config import *
 import socket
+
 
 # Note :- IF HEADER ISN'T THERE
 # SHOULD WE FETCH FROM DB & DO?
@@ -63,10 +66,10 @@ class DataEngine:
             elif db_columns[i] in NUMERICAL_BASED:
                 numerical_column_indexs.add(i)
         column_indexes = {
-            'timestampz_column_indexs':timestampz_column_indexs,
-            'ipv4_column_indexs':ipv4_column_indexs,
-            'ipv6_column_indexs':ipv6_column_indexs,
-            'numerical_column_indexs':numerical_column_indexs
+            'timestampz_column_indexs': timestampz_column_indexs,
+            'ipv4_column_indexs': ipv4_column_indexs,
+            'ipv6_column_indexs': ipv6_column_indexs,
+            'numerical_column_indexs': numerical_column_indexs
         }
         return column_indexes
 
@@ -104,8 +107,8 @@ class DataEngine:
         # Convert the value to an integer type
         # If integer values are in string format:
         # return int(value)
-        return 
-    
+        return
+
     @staticmethod
     def convert_string_to_ipv6_varbinary(ipv6_address):
         try:
