@@ -69,7 +69,7 @@ class DataTransfer:
                 # It's a single file
                 data_file = os.path.basename(self.data_source)
                 table_name = os.path.splitext(data_file)[0]
-                DataEngine.schema_match(self, table_name, dest_db_interface=db_interface, csv_file=data_file)
+                schema_match = DataEngine.schema_match(table_name, dest_db_interface, csv_file=data_file)
                 if not schema_match:
                     print(f"Schema mismatch for table '{table_name}' between csv file and database.")
                     return
