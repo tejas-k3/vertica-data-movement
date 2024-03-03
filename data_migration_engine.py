@@ -4,7 +4,8 @@ from libs.column_config import *
 import socket
 
 
-# Note :- IF HEADER ISN'T THERE SHOULD WE FETCH FROM DB & DO?
+# Note :- IF HEADER ISN'T THERE
+# SHOULD WE FETCH FROM DB & DO?
 class DataEngine:
 
     @staticmethod
